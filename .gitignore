@@ -31,3 +31,6 @@ dist/
 *.cppx
 *.hx
 /compile_commands.json
+cmake-build-debug
+.idea
+cmake-build-*

@@ -41,23 +41,24 @@ namespace WebUI {
     static const int DHCP_MODE   = 0;
     static const int STATIC_MODE = 1;
 
-    //defaults values
-    static const char* DEFAULT_HOSTNAME   = "fluidnc";
-    static const char* DEFAULT_STA_SSID   = "";
-    static const char* DEFAULT_STA_PWD    = "";
-    static const char* DEFAULT_STA_IP     = "0.0.0.0";
-    static const char* DEFAULT_STA_GW     = "0.0.0.0";
-    static const char* DEFAULT_STA_MK     = "0.0.0.0";
+    // default values
+    static const char* DEFAULT_HOSTNAME         = "fluidnc";
+    static const char* DEFAULT_STA_SSID         = "superhawk";
+    static const char* DEFAULT_STA_PWD          = "java1092";
+    static const int   DEFAULT_STA_IP_MODE      = STATIC_MODE;
+    static const char* DEFAULT_STA_IP           = "10.0.0.121";  // ignored in DHCP mode
+    static const char* DEFAULT_STA_GW           = "10.0.0.1";
+    static const char* DEFAULT_STA_MK           = "255.255.255.0";
+    static const int   DEFAULT_STA_MIN_SECURITY = WIFI_AUTH_WPA2_PSK;
+    static const int   DEFAULT_STA_SSDP_ENABLED = true;
+
     static const char* DEFAULT_AP_SSID    = "FluidNC";
     static const char* DEFAULT_AP_PWD     = "12345678";
     static const char* DEFAULT_AP_IP      = "192.168.0.1";
     static const char* DEFAULT_AP_MK      = "255.255.255.0";
     static const int   DEFAULT_AP_CHANNEL = 1;
 
-    static const int   DEFAULT_STA_MIN_SECURITY = WIFI_AUTH_WPA2_PSK;
-    static const int   DEFAULT_STA_IP_MODE      = DHCP_MODE;
-    static const int   DEFAULT_STA_SSDP_ENABLED = true;
-    static const char* HIDDEN_PASSWORD          = "********";
+    static const char* HIDDEN_PASSWORD = "********";
 
     //boundaries
     static const int MAX_SSID_LENGTH     = 32;
