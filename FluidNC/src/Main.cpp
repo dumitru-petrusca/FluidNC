@@ -24,6 +24,7 @@
 
 #    include "WebUI/WifiConfig.h"
 #    include "Driver/localfs.h"
+#    include "Synchro.h"
 
 extern void make_user_commands();
 
@@ -127,6 +128,7 @@ void setup() {
             config->_probe->init();
         }
 
+//        synchro_init();
     } catch (const AssertionFailed& ex) {
         // This means something is terribly broken:
         log_error("Critical error in main_init: " << ex.what());

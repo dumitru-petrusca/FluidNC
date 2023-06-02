@@ -14,6 +14,7 @@
 #include "I2SOut.h"          // i2s_out_reset
 #include "Platform.h"        // WEAK_LINK
 #include "Settings.h"        // coords
+#include "Synchro.h"         // Index
 
 #include <cmath>
 
@@ -111,9 +112,38 @@ bool mc_linear(float* target, plan_line_data_t* pl_data, float* position) {
     if (!pl_data->is_jog && !pl_data->limits_checked) {  // soft limits for jogs have already been dealt with
         if (config->_kinematics->invalid_line(target)) {
             return false;
-        }
+    }
     }
     return mc_linear_no_check(target, pl_data, position);
+}
+
+void mc_linear_synchro(float* target, plan_line_data_t* pl_data, float* position) {
+    // Finish all queued commands and empty planner buffer before starting synchronized motion
+    protocol_buffer_synchronize();
+    if (sys.abort) {
+        return;  // Return if system reset has been issued.
+    }
+
+    config->_stepping->beginLowLatency();
+
+    // Wait for spindle to synchronize
+    synchro_wait_for_index();
+    // Setup and queue synchro motion
+    mc_linear(target, pl_data, gc_state.position);
+    // Perform motion
+    protocol_send_event(&cycleStartEvent);
+    // Wait until motion completes
+    do {
+        protocol_execute_realtime();
+    } while (!sys.abort && sys.state != State::Idle);
+
+    config->_stepping->endLowLatency();
+
+    if (sys.abort) {
+        return;  // Return if system reset has been issued.
+    }
+
+    protocol_execute_realtime();  // Check and execute run-time commands
 }
 
 // Execute an arc in offset mode format. position == current xyz, target == target xyz,
@@ -272,6 +302,12 @@ bool mc_dwell(int32_t milliseconds) {
     }
     protocol_buffer_synchronize();
     return delay_msec(milliseconds, DwellMode::Dwell);
+}
+
+// Execute dwell until index signal pulse.
+void mc_synchro_dwell() {
+    protocol_buffer_synchronize();
+    synchro_wait_for_index();
 }
 
 volatile ProbeState probeState;

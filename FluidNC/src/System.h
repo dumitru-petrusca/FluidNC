@@ -49,6 +49,7 @@ struct system_t {
     Percent        spindle_speed_ovr;  // Spindle speed value in percent
     Override       override_ctrl;      // Tracks override control states.
     SpindleSpeed   spindle_speed;
+    float          pitch;
 };
 extern system_t sys;
 

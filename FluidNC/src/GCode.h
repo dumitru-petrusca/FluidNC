@@ -71,6 +71,7 @@ enum class Motion : uint8_t {
     Linear             = 1,    // G1 (Do not alter value)
     CwArc              = 2,    // G2 (Do not alter value)
     CcwArc             = 3,    // G3 (Do not alter value)
+    LinearSynchro      = 4,    // G32 (Do not alter value)
     ProbeToward        = 140,  // G38.2 (Do not alter value)
     ProbeTowardNoError = 141,  // G38.3 (Do not alter value)
     ProbeAway          = 142,  // G38.4 (Do not alter value)

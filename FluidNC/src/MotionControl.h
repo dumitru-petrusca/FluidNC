@@ -22,6 +22,9 @@ const int PARKING_MOTION_LINE_NUMBER = 0;
 // Execute a linear motion in cartesian space.
 bool mc_linear(float* target, plan_line_data_t* pl_data, float* position);
 
+// Execute linear motion synchronized to spindle rotation. Used for threading.
+void mc_linear_synchro(float* target, plan_line_data_t* pl_data, float* position);
+
 // Execute a linear motion in motor space.
 bool mc_move_motors(float* target, plan_line_data_t* pl_data);  // returns true if line was submitted to planner
 
@@ -42,6 +45,8 @@ void mc_arc(float*            target,
 
 // Dwell for a specific number of seconds
 bool mc_dwell(int32_t milliseconds);
+
+void mc_synchro_dwell();
 
 // Perform tool length probe cycle. Requires probe switch.
 GCUpdatePos mc_probe_cycle(float* target, plan_line_data_t* pl_data, bool away, bool no_error, uint8_t offsetAxis, float offset);

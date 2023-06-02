@@ -32,6 +32,7 @@
 #include "WebUI/BTConfig.h"              // bt_config
 #include "WebUI/WebSettings.h"
 #include "InputFile.h"
+#include "Synchro.h"
 
 #include <map>
 #include <freertos/task.h>
@@ -263,6 +264,9 @@ void report_gcode_modes(Channel& channel) {
         case Motion::CcwArc:
             msg << "G3";
             break;
+        case Motion::LinearSynchro:
+            msg << "G32";
+            break;
         case Motion::ProbeToward:
             msg << "G38.2";
             break;
@@ -491,6 +495,8 @@ const char* state_name() {
             return "Door:2";  // Retracting
         case State::Sleep:
             return "Sleep";
+        case State::Sync:
+            return "Sync";
     }
     return "";
 }
@@ -563,6 +569,10 @@ void report_realtime_status(Channel& channel) {
         rate /= MM_PER_INCH;
     }
     msg << "|FS:" << setprecision(0) << rate << "," << sys.spindle_speed;
+
+    msg << "|RPM:" << setprecision(1) << synchro_spindle_rpm();
+
+    msg << "|P:" << setprecision(3) << sys.pitch;
 
     if (report_pin_string.length()) {
         msg << "|Pn:" << report_pin_string;

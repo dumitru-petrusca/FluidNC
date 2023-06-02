@@ -16,6 +16,7 @@
 #include "Platform.h"             // WEAK_LINK
 
 #include "Machine/MachineConfig.h"
+#include "Synchro.h"
 
 #include <string.h>  // memset
 #include <math.h>    // sqrt etc.
@@ -300,6 +301,13 @@ Error gc_execute_line(char* line) {
                         axis_command          = AxisCommand::MotionMode;
                         gc_block.modal.motion = Motion::CcwArc;
                         mg_word_bit           = ModalGroup::MG1;
+                        break;
+                    case 32:  // G32 - single point threading
+                        axis_command          = AxisCommand::MotionMode;
+                        gc_block.modal.motion = Motion::LinearSynchro;
+                        gc_block.values.f     = (float)(sys.pitch * synchro_spindle_rpm());
+                        mg_word_bit           = ModalGroup::MG1;
+                        value_words |= bitnum_to_mask(GCodeWord::F);
                         break;
                     case 38:  // G38 - probe
                         //only allow G38 "Probe" commands if a probe pin is defined.
@@ -675,6 +683,7 @@ Error gc_execute_line(char* line) {
                     case 'P':
                         axis_word_bit     = GCodeWord::P;
                         gc_block.values.p = value;
+                        sys.pitch         = value;
                         break;
                     case 'Q':
                         axis_word_bit     = GCodeWord::Q;
@@ -1122,6 +1131,7 @@ Error gc_execute_line(char* line) {
                 case Motion::Seek:
                     break;  // Feed rate is unnecessary
                 case Motion::Linear:
+                case Motion::LinearSynchro:
                     // [G1 Errors]: Feed rate undefined. Axis letter not configured or without real value.
                     // Axis words are optional. If missing, set axis command flag to ignore execution.
                     if (!axis_words) {
@@ -1595,6 +1605,8 @@ Error gc_execute_line(char* line) {
             GCUpdatePos gc_update_pos = GCUpdatePos::Target;
             if (gc_state.modal.motion == Motion::Linear) {
                 mc_linear(gc_block.values.xyz, pl_data, gc_state.position);
+            } else if (gc_state.modal.motion == Motion::LinearSynchro) {
+                mc_linear_synchro(gc_block.values.xyz, pl_data, gc_state.position);
             } else if (gc_state.modal.motion == Motion::Seek) {
                 pl_data->motion.rapidMotion = 1;  // Set rapid motion flag.
                 mc_linear(gc_block.values.xyz, pl_data, gc_state.position);
