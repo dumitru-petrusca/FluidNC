@@ -18,6 +18,7 @@
 #include "MotionControl.h"  // PARKING_MOTION_LINE_NUMBER
 #include "Settings.h"       // settings_execute_startup
 #include "Machine/LimitPin.h"
+#include "Jog.h"
 
 volatile ExecAlarm lastAlarm;  // The most recent alarm code
 
@@ -185,7 +186,19 @@ const uint32_t heapWarnThreshold = 15000;
 uint32_t heapLowWater           = UINT_MAX;
 uint32_t heapLowWaterReported   = UINT_MAX;
 int32_t  heapLowWaterReportTime = 0;
-void     protocol_main_loop() {
+
+void enter_mpg_mode() {
+    if (config->_axes->has_mpgs() && plan_get_current_block() == nullptr && sys.state == State::Idle) {
+        config->_axes->reset_mpgs();
+        sys.mpg_mode           = true;
+        uint32_t max_step_rate = config->_axes->compute_max_step_rate();
+        uint64_t alarm         = uint64_t(Stepping::fStepperTimer / float(max_step_rate));
+        stepTimerStart(alarm);
+        log_info("Entered MPG mode.");
+    }
+}
+
+void protocol_main_loop() {
     start_polling();
 
     // ---------------------------------------------------------------------------------
@@ -193,11 +206,25 @@ void     protocol_main_loop() {
     // This is also where the system idles while waiting for something to do.
     // ---------------------------------------------------------------------------------
     for (;; vTaskDelay(0)) {
+        bool restore_mpg_mode = false;
+
         if (activeChannel) {
             // The input polling task has collected a line of input
 #ifdef DEBUG_REPORT_ECHO_RAW_LINE_RECEIVED
             report_echo_line_received(activeLine, *activeChannel);
 #endif
+
+            // Stop the MPGs, if running, and sync the parser's and planer's positions
+            if (sys.mpg_mode) {
+                log_info("Sync MPG Position...");
+                restore_mpg_mode = true;
+                // stop the ISR
+                sys.mpg_mode = false;
+                delay_ms(10);  // TODO-dp, wait for the ISR to actually die
+                // sync positions
+                gc_sync_position();
+                plan_sync_position();
+            }
 
             Error status_code = execute_line(activeLine, *activeChannel, WebUI::AuthenticationLevel::LEVEL_GUEST);
 
@@ -212,11 +239,19 @@ void     protocol_main_loop() {
             activeChannel = nullptr;
         }
 
+        //        jog_mpg();
+
         // Auto-cycle start any queued moves.
         protocol_auto_cycle_start();
         protocol_execute_realtime();  // Runtime command check point.
         if (sys.abort) {
             sys.abort = false;
+        }
+
+        // Check if there are any blocks in the buffer. If not return to MPG mode.
+        if (restore_mpg_mode) {
+            // Buffer is empty, enable the MPGs
+            enter_mpg_mode();
         }
 
         // check to see if we should disable the stepper drivers
@@ -303,6 +338,7 @@ void protocol_execute_realtime() {
 
 static void protocol_run_startup_lines() {
     settings_execute_startup();  // Execute startup script.
+    enter_mpg_mode();
 }
 
 static void protocol_do_restart() {
@@ -350,6 +386,8 @@ static void protocol_do_restart() {
             config->_macros->_after_reset.run();
         }
     }
+
+    enter_mpg_mode();
 }
 
 static void protocol_do_start() {
@@ -730,6 +768,8 @@ void protocol_do_cycle_stop() {
             Machine::Homing::cycleStop();
             break;
     }
+
+    enter_mpg_mode();
 }
 
 static void update_velocities() {
@@ -997,6 +1037,7 @@ static void protocol_do_limit(void* arg) {
     }
     log_debug("Limit switch tripped for " << config->_axes->axisName(limit->_axis) << " motor " << limit->_motorNum);
 }
+
 static void protocol_do_fault_pin(void* arg) {
     if (sys.state == State::Cycle || sys.state == State::Jog) {
         mc_critical(ExecAlarm::HardStop);  // Initiate system kill.
@@ -1004,6 +1045,27 @@ static void protocol_do_fault_pin(void* arg) {
     ControlPin* pin = (ControlPin*)arg;
     log_info("Stopped by " << pin->_legend);
 }
+
+static void protocol_do_estop_pin(void* arg) {
+    if (sys.state != State::Critical) {
+        Stepper::reset();
+        spindle->stop();
+        protocol_disable_steppers();
+        Homing::set_all_axes_unhomed();
+
+        system_reset();
+        protocol_reset();
+        gc_init();
+        plan_reset();
+
+        log_info_to(allChannels, "EMERGENCY STOP");
+        log_stream(allChannels, "EMERGENCY STOP");
+        delay_ms(500);  // Force delay to ensure message clears serial write buffer.
+
+        sys.state = State::Critical;
+    }
+}
+
 void protocol_do_rt_reset() {
     if (sys.state == State::Homing) {
         Machine::Homing::fail(ExecAlarm::HomingFailReset);
@@ -1023,31 +1085,32 @@ void protocol_do_rt_reset() {
     protocol_send_event(&restartEvent);
 }
 
-ArgEvent feedOverrideEvent { protocol_do_feed_override };
-ArgEvent rapidOverrideEvent { protocol_do_rapid_override };
-ArgEvent spindleOverrideEvent { protocol_do_spindle_override };
-ArgEvent accessoryOverrideEvent { protocol_do_accessory_override };
-ArgEvent limitEvent { protocol_do_limit };
-ArgEvent faultPinEvent { protocol_do_fault_pin };
+ArgEvent feedOverrideEvent { "feedOverrideEvent", protocol_do_feed_override };
+ArgEvent rapidOverrideEvent { "rapidOverrideEvent", protocol_do_rapid_override };
+ArgEvent spindleOverrideEvent { "spindleOverrideEvent", protocol_do_spindle_override };
+ArgEvent accessoryOverrideEvent { "accessoryOverrideEvent", protocol_do_accessory_override };
+ArgEvent limitEvent { "limitEvent", protocol_do_limit };
+ArgEvent faultPinEvent { "faultPinEvent", protocol_do_fault_pin };
+ArgEvent estopPinEvent { "estopPinEvent", protocol_do_estop_pin };
 
-ArgEvent reportStatusEvent { (void (*)(void*))report_realtime_status };
+ArgEvent reportStatusEvent { "reportStatusEvent", (void (*)(void*))report_realtime_status };
 
-NoArgEvent safetyDoorEvent { request_safety_door };
-NoArgEvent feedHoldEvent { protocol_do_feedhold };
-NoArgEvent cycleStartEvent { protocol_do_cycle_start };
-NoArgEvent cycleStopEvent { protocol_do_cycle_stop };
-NoArgEvent motionCancelEvent { protocol_do_motion_cancel };
-NoArgEvent sleepEvent { protocol_do_sleep };
-NoArgEvent debugEvent { report_realtime_debug };
-NoArgEvent startEvent { protocol_do_start };
-NoArgEvent restartEvent { protocol_do_restart };
-NoArgEvent runStartupLinesEvent { protocol_run_startup_lines };
+NoArgEvent safetyDoorEvent { "safetyDoorEvent", request_safety_door };
+NoArgEvent feedHoldEvent { "feedHoldEvent", protocol_do_feedhold };
+NoArgEvent cycleStartEvent { "cycleStartEvent", protocol_do_cycle_start };
+NoArgEvent cycleStopEvent { "cycleStopEvent", protocol_do_cycle_stop };
+NoArgEvent motionCancelEvent { "motionCancelEvent", protocol_do_motion_cancel };
+NoArgEvent sleepEvent { "sleepEvent", protocol_do_sleep };
+NoArgEvent debugEvent { "debugEvent", report_realtime_debug };
+NoArgEvent startEvent { "startEvent", protocol_do_start };
+NoArgEvent restartEvent { "restartEvent", protocol_do_restart };
+NoArgEvent runStartupLinesEvent { "runStartupLinesEvent", protocol_run_startup_lines };
 
-NoArgEvent rtResetEvent { protocol_do_rt_reset };
+NoArgEvent rtResetEvent { "rtResetEvent", protocol_do_rt_reset };
 
 // The problem is that report_realtime_status needs a channel argument
-// Event statusReportEvent { protocol_do_status_report(XXX) };
-ArgEvent alarmEvent { (void (*)(void*))protocol_do_alarm };
+// Event statusReportEvent{"statusReportEvent", protocol_do_status_report(XXX) };
+ArgEvent alarmEvent { "alarmEvent", (void (*)(void*))protocol_do_alarm };
 
 xQueueHandle event_queue;
 
@@ -1067,6 +1130,7 @@ void protocol_send_event(Event* evt, void* arg) {
 void protocol_handle_events() {
     EventItem item;
     while (xQueueReceive(event_queue, &item, 0)) {
+        log_info("Event: " << item.event->_name);
         item.event->run(item.arg);
     }
 }

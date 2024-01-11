@@ -1,0 +1,55 @@
+ESP 32 PINS
+===========
+https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+
+Pin In   Out  Notes
+=== ==== ==   =====
+0   high OK   outputs PWM signal at boot, must be LOW to enter flashing mode
+1   TX   OK   debug output at boot
+2   OK   OK   connected to on-board LED, must be left floating or LOW to enter flashing mode
+3   OK   RX   pin HIGH at boot
+4   OK   OK
+5   OK   OK   outputs PWM signal at boot, strapping pin
+6   x    x    connected to the integrated SPI flash
+7   x    x    connected to the integrated SPI flash
+8   x    x    connected to the integrated SPI flash
+9   x    x    connected to the integrated SPI flash
+10  x    x    connected to the integrated SPI flash
+11  x    x    connected to the integrated SPI flash
+12  OK   OK   boot fails if pulled high, strapping pin
+13  OK   OK
+14  OK   OK   outputs PWM signal at boot
+15  OK   OK   outputs PWM signal at boot, strapping pin
+16  OK   OK
+17  OK   OK
+18  OK   OK
+19  OK   OK
+21  OK   OK
+22  OK   OK
+23  OK   OK
+25  OK   OK
+26  OK   OK
+27  OK   OK
+32  OK   OK
+33  OK   OK
+34  OK   x    input only
+35  OK   x    input only
+36  OK   x    input only
+39  OK   x    input only
+
+
+19 input/output, 5 input only, 2 output only
+
+Available: 26
+
+ISO
+================================================================================
+I2S device: 74AHCT595 shift register
+http://wiki.fluidnc.com/en/support/controller_design_guidelines
+https://github.com/bdring/FluidNC/issues/153
+
+Level Shifters
+================================================================================
+3.3-5:
+74ACT245 (8 channel) - 25 mA per output, total device limit of 75 mA
+75HCT125 (4 channel) - 35 mA per out, total device limit of 70 mA

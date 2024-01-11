@@ -12,6 +12,7 @@ namespace Machine {
         handler.item("max_travel_mm", _maxTravel, 0.1, 10000000.0);
         handler.item("soft_limits", _softLimits);
         handler.section("homing", _homing);
+        handler.section("mpg", _mpg);
 
         char tmp[7];
         tmp[0] = 0;
@@ -36,7 +37,7 @@ namespace Machine {
         }
     }
 
-    void Axis::init() {
+    void Axis::init(uint32_t maxStepRate) {
         for (size_t i = 0; i < Axis::MAX_MOTORS_PER_AXIS; i++) {
             auto m = _motors[i];
             if (m) {
@@ -59,6 +60,10 @@ namespace Machine {
         if (hasDualMotor() && (motorsWithSwitches() == 1)) {
             _motors[0]->makeDualSwitches();
             _motors[1]->makeDualSwitches();
+        }
+
+        if (_mpg) {
+            _mpg->init(this, maxStepRate);
         }
     }
 
@@ -114,6 +119,10 @@ namespace Machine {
         } else {
             return 0.0f;
         }
+    }
+
+    int IRAM_ATTR Axis::getAxisNum() {
+        return _axis;
     }
 
     Axis::~Axis() {

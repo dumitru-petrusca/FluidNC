@@ -8,9 +8,9 @@ extern "C" {
 #include <stdbool.h>
 
 void stepTimerInit(uint32_t frequency, bool (*fn)(void));
+void IRAM_ATTR stepTimerStart(uint64_t alarm);
 void stepTimerStop();
 void stepTimerSetTicks(uint32_t ticks);
-void stepTimerStart();
 
 #ifdef __cplusplus
 }

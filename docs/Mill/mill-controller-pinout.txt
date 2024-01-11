@@ -1,0 +1,31 @@
+ESP 32 PINS
+===========
+https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+
+                  |------------WIFI----------|
+        |   3V3   |3V3|                  |GND|   GND   |
+        |   EN    |EN |                  |23 | SD MOSI |
+I       | X MPG A |36 |VP                |22 | X LIM L |
+I       | X MPG B |39 |VN              TX|1  | X LIM R | ↑DEBUG OUT
+I       | Y MPG A |34 |                RX|3  | Y LIM L | ↑HIGH
+I       | Y MPG B |35 |                  |21 | Y LIM R |
+        | Z MPG A |32 |                  |GND|   GND   |
+        | Z MPG B |33 |                  |19 | SD MISO |
+        | VFD RSD |25 |                  |18 | SD SCK  |
+        | VFD RTS |26 |                  |5  | SD CS   | ↑PWM
+        | VFD TXD |27 |                  |17 | Z LIM L |
+↑PWM    | OLED CL |14 |                  |16 | Z LIM R |
+↓BOOT   | E STOP  |12 |                  |4  | I2SO CK | ↓
+        |   GND   |GND|                  |0  | I2SO WS | ↑PWM FLASH
+↓       | OLED DA |13 |                  |2  | I2SO DS | ↓    FLASH
+        |    x    |9  |D2                |15 |         | ↑PWM BOOT
+        |    x    |10 |D3              D1|8  |    x    |
+        |    x    |11 |CMD             D0|7  |    x    |
+        |   5V0   |5V0|               CLK|6  |    x    |
+                  |-------------USB----------|
+
+
+Move MPGs to separate I2C Input Controller which handles:
+ - Axis MPGs
+ - Feed override encoder
+ - Spindle override encoder

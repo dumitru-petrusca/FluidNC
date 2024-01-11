@@ -1,0 +1,80 @@
+Shape Clearance Tolerance Features Size Thickness
+
+ADMT, ADGT, ADKT, ADHT, ADCT, ADSN,
+SCMT 12 04
+
+Shape
+    T - Triangle
+    A - Parallelogram (85°)
+    B - Parallelogram (82°)
+    K - Parallelogram (55°)
+    M – Diamond (86°)
+    C - Diamond (80°)
+    D - Diamond (55°)
+    E - Diamond (75°)
+    V - Diamond (35°)
+    L - Rectangle (Single-sided)
+    S - Square
+    P - Pentagon
+    H - Hexagon
+    O - Octagon
+    R - Round
+    W - Trigon (80°)
+
+Clearance
+    A - 0° Relief
+    M - 0° Relief, molded shape
+    N - 0° Relief
+    B - 5° Relief
+    C - 7° Relief
+    L - 11° Relief
+    P - 11° Relief, positive rake
+    D - 15° Relief
+    Q - 17.5° Relief
+    E - 20° Relief
+    F - 25° Relief
+    G - 30° Relief
+    K - Special relief angle
+
+Tolerance Class
+    A - High precision tolerance
+    B - Special tolerance
+    C - Very tight tolerance
+    D - Medium precision tolerance
+    E - Extra precision tolerance
+    F - Special precision tolerance
+    G - General tolerance
+    H - Extra tight tolerance
+    K - Tight tolerance for round inserts
+    M - Medium tolerance
+    N - Special tolerance
+    P - Special tolerance for triangular inserts
+    T - General tolerance for triangular inserts
+
+Features
+    B - Without Chipbreaker
+    C - Chipbreaker
+    F - Finishing Chipbreaker
+    G - General Purpose Chipbreaker
+    L - Light Cutting Chipbreaker
+    M - Medium Cutting Chipbreaker
+    P - Roughing Chipbreaker
+    S - Sharp Cutting Edge
+    T - Thick Insert
+    W - Wiper Insert
+
+Size
+    A, B, K (parallelogram) - The size of the cutting edge in mm (usually the long side)
+    S (square)              - side = 1.01 * n (n - the size number of the insert, side in mm)
+    M, Diamond (86°)        - side = 1 * n
+    C, Diamond (80°)        - side = 1.03 * n
+    E, Diamond (75°)        - side = 1.05 * n
+    D, Diamond (55°)        - side = 1.23 * n
+    V, Diamond (35°)        - side = 1.76 * n
+    T (Triangle)            - side = 1.75 * n
+    M, O (Octagon)          - width = 1.01 * n
+    R (Round)               - diameter = 1.01 * n
+    All others              - The length of the inscribed circle in 1/8" increments
+
+Thickness
+    in mm

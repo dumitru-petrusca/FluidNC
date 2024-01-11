@@ -41,6 +41,7 @@ union Suspend {
 // Global system variables
 struct system_t {
     volatile State state;              // Tracks the current system state
+    volatile bool  mpg_mode;
     bool           abort;              // System abort flag. Forces exit back to main loop for reset.
     Suspend        suspend;            // System suspend bitflag variable that manages holds, cancels, and safety door.
     StepControl    step_control;       // Governs the step segment generator depending on system state.

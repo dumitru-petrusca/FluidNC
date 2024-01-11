@@ -7,15 +7,17 @@
 // Protocol dequeues them and calls their run methods.
 class Event {
 public:
-    Event() {}
+    Event(char const* name) : _name(name) {}
     virtual void run(void* arg) = 0;
+
+    char const* _name;
 };
 
 class NoArgEvent : public Event {
     void (*_function)() = nullptr;
 
 public:
-    NoArgEvent(void (*function)()) : _function(function) {}
+    NoArgEvent(char const* name, void (*function)()) : Event(name), _function(function) {}
     void run(void* arg) override {
         if (_function) {
             _function();
@@ -27,7 +29,7 @@ class ArgEvent : public Event {
     void (*_function)(void*) = nullptr;
 
 public:
-    ArgEvent(void (*function)(void*)) : _function(function) {}
+    ArgEvent(char const* name, void (*function)(void*)) : Event(name), _function(function) {}
     void run(void* arg) override {
         if (_function) {
             _function(arg);

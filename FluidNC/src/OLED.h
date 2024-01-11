@@ -81,10 +81,10 @@ private:
 public:
     OLED() : Channel("oled") {}
 
-    OLED(const OLED&) = delete;
-    OLED(OLED&&)      = delete;
+    OLED(const OLED&)            = delete;
+    OLED(OLED&&)                 = delete;
     OLED& operator=(const OLED&) = delete;
-    OLED& operator=(OLED&&) = delete;
+    OLED& operator=(OLED&&)      = delete;
 
     virtual ~OLED() = default;
 
@@ -94,9 +94,10 @@ public:
 
     // Configurable
 
-    uint8_t _address = 0x3c;
-    int     _width   = 64;
-    int     _height  = 48;
+    uint8_t     _address = 0x3c;
+    int         _width   = 64;
+    int         _height  = 48;
+    std::string _type    = "SSD1306";
 
     // Channel method overrides
 
@@ -122,6 +123,7 @@ public:
         handler.item("i2c_address", _address);
         handler.item("width", _width);
         handler.item("height", _height);
+        handler.item("type", _type);
         handler.item("radio_delay_ms", _radio_delay);
     }
 };

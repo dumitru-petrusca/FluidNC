@@ -643,6 +643,17 @@ void report_realtime_status(Channel& channel) {
     if (InputFile::_progress.length()) {
         msg << "|" + InputFile::_progress;
     }
+
+    auto    n_axis    = config->_axes->_numberAxis;
+    uint8_t mpg_state = 0;
+    for (int axis = 0; axis < n_axis; axis++) {
+        MPG* mpg = config->_axes->_axis[axis]->_mpg;
+        if (mpg != nullptr && !mpg->_locked) {
+            mpg_state |= bitnum_to_mask(axis);
+        }
+    }
+    msg << "|MPG:" << mpg_state;
+
 #ifdef DEBUG_STEPPER_ISR
     msg << "|ISRs:" << Stepper::isr_count;
 #endif

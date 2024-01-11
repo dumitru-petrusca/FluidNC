@@ -1,0 +1,6 @@
+Name              CPR   SHAFT   COUNT
+====              ===   ====    =====
+HEDS-5701 F00     256   1/4     1
+HEDS-5540 A05     500   3/16    2           small
+E2-500-250-I      500   1/4     1
+E3-1000-472-H     1000  12mm    1           large

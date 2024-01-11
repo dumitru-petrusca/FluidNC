@@ -39,11 +39,12 @@ namespace Machine {
         }
 
         // certain motors need features to be turned on. Check them here
+        uint32_t maxStepRate = compute_max_step_rate();
         for (size_t axis = X_AXIS; axis < _numberAxis; axis++) {
             auto a = _axis[axis];
             if (a) {
                 log_info("Axis " << axisName(axis) << " (" << limitsMinPosition(axis) << "," << limitsMaxPosition(axis) << ")");
-                a->init();
+                a->init(maxStepRate);
             }
         }
 
@@ -276,6 +277,35 @@ namespace Machine {
         }
 
         return retval;
+    }
+
+    bool Axes::has_mpgs() {
+        for (int axis = 0; axis < _numberAxis; axis++) {
+            if (_axis[axis]->_mpg != nullptr) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Axes::reset_mpgs() {
+        for (int axis = 0; axis < _numberAxis; axis++) {
+            MPG* mpg = _axis[axis]->_mpg;
+            if (mpg != nullptr) {
+                mpg->reset();
+            }
+        }
+    }
+
+    uint32_t Axes::compute_max_step_rate() const {
+        uint32_t maxStepRate = 0;
+        for (int i = 0; i < _numberAxis; i++) {
+            if (_axis[i]->_mpg != nullptr) {
+                uint32_t stepRate = uint32_t(_axis[i]->_stepsPerMm * _axis[i]->_maxRate / 60.0);
+                maxStepRate       = max(maxStepRate, stepRate);
+            }
+        }
+        return maxStepRate;
     }
 
     Axes::~Axes() {

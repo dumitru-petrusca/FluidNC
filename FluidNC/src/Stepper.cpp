@@ -198,12 +198,17 @@ bool IRAM_ATTR Stepper::pulse_func() {
     isr_count++;
 #endif
     // This is a precaution in case we get a spurious interrupt
-    if (!awake) {
+    if (!sys.mpg_mode && !awake) {
         return false;
     }
-    auto n_axis = config->_axes->_numberAxis;
 
     config->_axes->step(st.step_outbits, st.dir_outbits);
+
+    if (sys.mpg_mode) {
+        return handle_mpgs();
+    }
+
+    auto n_axis = config->_axes->_numberAxis;
 
     // If there is no step segment, attempt to pop one from the stepper buffer
     if (st.exec_segment == NULL) {
@@ -278,6 +283,32 @@ bool IRAM_ATTR Stepper::pulse_func() {
         segment_buffer_tail = segment_buffer_tail >= (config->_stepping->_segments - 1) ? 0 : segment_buffer_tail + 1;
     }
 
+    config->_axes->unstep();
+    return true;
+}
+
+bool IRAM_ATTR Stepper::handle_mpgs() {  // Reset step and dir out bits.
+    st.step_outbits = 0;
+
+    auto n_axis = config->_axes->_numberAxis;
+    for (int axis = 0; axis < n_axis; axis++) {
+        MPG* mpg = config->_axes->_axis[axis]->_mpg;
+        if (mpg != nullptr) {
+            int32_t pending_steps = mpg->get_pending_steps();
+            // Generate step and direction pulses
+            if (pending_steps > 0) {
+                clear_bitnum(st.dir_outbits, axis);  // CW
+                set_bitnum(st.step_outbits, axis);
+                mpg->update_pending_steps(+1);
+            } else if (pending_steps < 0) {
+                set_bitnum(st.dir_outbits, axis);  // CCW
+                set_bitnum(st.step_outbits, axis);
+                mpg->update_pending_steps(-1);
+            }
+        }
+    }
+
+    delay_us(5);  // TODO-dp, may not be needed
     config->_axes->unstep();
     return true;
 }

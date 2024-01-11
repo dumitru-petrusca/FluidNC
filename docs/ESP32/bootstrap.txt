@@ -1,0 +1,23 @@
+Program a new ESP32
+====================
+1: Plug the ESP32 into the USB port
+2: Got to https://installer.fluidnc.com/files and install the latest firmware
+3: Upload the config.yaml file and the WebUI
+4. Upload the desired local firmware
+5. Restart ESP32, it should work
+
+Install esptool.py
+==================
+1. Go to https://docs.espressif.com/projects/esptool/en/latest/esp32/
+2. Follow instructions to install
+3. Example command:
+      esptool.py -p /dev/cu.usbserial-0001 flash_id
+      esptool.py -p /dev/cu.usbserial-0001 chip_id
+
+
+2. Upload the firmware to it
+3. Open the ESP32-WEBUI project
+4. Create the file system by running: pio run -t uploadfs
+4. Run: gulp package --lang en; python fluidnc-web-sim.py 10.0.0.121
+5. Upload the config.xml file to the file system
+6. Upload the WebUI to the file system

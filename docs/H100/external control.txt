@@ -1,0 +1,37 @@
+H100 External Control (page 77)
+===============================
+
+F001 = 1  (external control, X1-X6)
+F002 = 1  (frequency is controlled by AI1 input)
+
+Registers
+=========
+F044 - X1
+F045 - X2
+F046 - X3
+F047 - X4
+F048 - X5
+F049 - X6
+
+Register Settings
+=================
+01 - RUN
+04 - STOP
+13 - E-STOP
+
+Speed Control (Variable Resistor), page 57
+=================================
+P12, GND - connect the ends
+AI2      - connect the wiper
+Jumper J3 must be set to voltage mode, default is current mode
+
+F070 = 0    (0-10V range),
+            P12 is 12 V so a resistor is needed to reduce the voltage
+            0.2*R, R - value of variable resistor
+F072 = 100  (frequency corresponding to max analog voltage of 10V)
+F073 = 0    (frequency corresponding to min analog voltage of 0V)
+
+Output Control
+=================================
+F053 - Output function of relay terminals FA, FB, FC
+  - 1: Indication during running

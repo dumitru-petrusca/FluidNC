@@ -1,0 +1,71 @@
+name: "Demo"
+board: "ESP32 Dev Controller V4"
+
+stepping:
+  engine: I2S_STATIC
+  idle_ms: 250
+  dir_delay_us: 1
+  pulse_us: 5
+  disable_delay_us: 0
+
+start:
+  check_limits: true
+  must_home: false
+  deactivate_parking: false
+
+control:
+  safety_door_pin: NO_PIN
+
+spi:
+  miso_pin: gpio.19
+  mosi_pin: gpio.23
+  sck_pin: gpio.18
+
+sdcard:
+  cs_pin: gpio.5
+  card_detect_pin: NO_PIN
+  frequency_hz: 8000000
+
+i2c0:
+   sda_pin: gpio.22
+   scl_pin: gpio.21
+
+oled:
+   type: "SH1106"
+   width: 128
+   height: 64
+   i2c_num: 0
+   i2c_address: 60
+   radio_delay_ms: 1000
+
+i2so:
+  data_pin: gpio.13
+  ws_pin: gpio.14
+  bck_pin: gpio.27
+
+axes:
+
+  #  1 rot = 6.35 mm = 200 * 10 steps = 2000 steps
+  #          1.00 mm =                     x steps
+  #  x = 1.00 * 2000 / 6.35 = 314.96 steps/mm, ~0.003 mm/step
+  #  127 mm/s, ~40000 step/s
+
+  x:
+    steps_per_mm: 314.96
+    max_rate_mm_per_min: 7620.0
+    acceleration_mm_per_sec2: 300
+    max_travel_mm: 1000
+    motor0:
+      limit_neg_pin: gpio.34:low
+      limit_pos_pin: gpio.35:low
+      hard_limits: true
+      stepstick:
+        step_pin: i2so.0
+        direction_pin: i2so.1
+    mpg:
+      a_pin: gpio.32
+      b_pin: gpio.33
+      reverse: false
+      pulses_per_rev: 1000
+      max_rpm: 250.0
+      max_rate_factor: 0.75

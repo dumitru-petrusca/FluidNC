@@ -29,8 +29,8 @@ static void IRAM_ATTR timer_isr(void* arg) {
     }
 }
 
-void IRAM_ATTR stepTimerStart() {
-    timer_ll_set_alarm_value(&TIMERG0, TIMER_0, 10ULL);  // Interrupt very soon to start the stepping
+void IRAM_ATTR stepTimerStart(uint64_t alarm) {
+    timer_ll_set_alarm_value(&TIMERG0, TIMER_0, alarm);
     timer_ll_set_alarm_enable(&TIMERG0, TIMER_0, true);
     timer_ll_set_counter_enable(&TIMERG0, TIMER_0, true);
 }

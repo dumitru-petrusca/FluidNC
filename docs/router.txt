@@ -1,0 +1,6 @@
+Router IP: 10.0.0.1 (admin/j)
+
+Device Name    MAC Address         IP           Use
+===========    ===========         ==           ===
+esp32-693994   10:52:1C:69:39:94   10.0.0.120   Lathe
+esp32-80182C   78:21:84:80:18:2C   10.0.0.121   Test Platform

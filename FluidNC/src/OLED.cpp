@@ -1,6 +1,7 @@
 #include "OLED.h"
 
 #include "Machine/MachineConfig.h"
+#include "SH1106_I2C.h"
 
 void OLED::show(Layout& layout, const char* msg) {
     if (_width < layout._width_required) {
@@ -68,7 +69,15 @@ void OLED::init() {
         return;
     }
     log_info("OLED I2C address: " << to_hex(_address) << " width: " << _width << " height: " << _height);
-    _oled = new SSD1306_I2C(_address, _geometry, config->_i2c[_i2c_num], 400000);
+    if (_type == "SSD1306") {
+        _oled = new SSD1306_I2C(_address, _geometry, config->_i2c[_i2c_num], 400000);
+    } else if (_type == "SH1106") {
+        _oled = new SH1106_I2C(_address, _geometry, config->_i2c[_i2c_num], 400000);
+    } else {
+        log_error("Unsupported OLED type");
+        _error = true;
+        return ;
+    }
     _oled->init();
 
     _oled->flipScreenVertically();

@@ -1,0 +1,62 @@
+public class Main {
+  int n, t, e;
+
+  public Main(float isrHz, float stepHz) {
+    this.t = 100;
+    this.n = (int) (stepHz / isrHz * this.t);
+    this.e = 2 * n - t;
+    System.out.printf("n = %d, t = %d", n, t);
+  }
+
+  void step() {
+    System.out.printf("\n%3d  :: ", e);
+    if (e > 0) {
+      System.out.print("step");
+      e -= 2 * t;
+    }
+    e += 2 * n;
+  }
+
+  public static void main(String[] args) {
+    Main stepping = new Main(60000.0f, 15000.0f);
+    for (int i = 0; i < 100; i++) {
+      stepping.step();
+    }
+  }
+}
+
+Example: 60000.0f, 15000.0f
+n = 25, t = 100
+
+e    :: step
+============
+-50  ::
+  0  ::
+ 50  :: step
+-100  ::
+-50  ::
+  0  ::
+ 50  :: step
+-100  ::
+-50  ::
+  0  ::
+ 50  :: step
+-100  ::
+-50  ::
+  0  ::
+ 50  :: step
+-100  ::
+-50  ::
+  0  ::
+ 50  :: step
+-100  ::
+-50  ::
+  0  ::
+ 50  :: step
+-100  ::
+-50  ::
+  0  ::
+ 50  :: step
+-100  ::
+-50  ::
+  0  ::

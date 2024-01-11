@@ -82,6 +82,10 @@ namespace Machine {
         void group(Configuration::HandlerBase& handler) override;
         void afterParse() override;
 
+        bool     has_mpgs();
+        void     reset_mpgs();
+        uint32_t compute_max_step_rate() const;
+
         ~Axes();
     };
 }

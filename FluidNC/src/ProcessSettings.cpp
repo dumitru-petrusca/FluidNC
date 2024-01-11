@@ -474,6 +474,32 @@ static Error home_b(const char* value, WebUI::AuthenticationLevel auth_level, Ch
 static Error home_c(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
     return home(bitnum_to_mask(C_AXIS));
 }
+static Error toggle_lock(int axis) {
+    MPG* mpg = config->_axes->_axis[axis]->_mpg;
+    if (!mpg) {
+        return Error::NoMPGForAxis;
+    }
+    mpg->toggleLocked();
+    return Error::Ok;
+}
+static Error lock_x(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
+    return toggle_lock(X_AXIS);
+}
+static Error lock_y(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
+    return toggle_lock(Y_AXIS);
+}
+static Error lock_z(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
+    return toggle_lock(Z_AXIS);
+}
+static Error lock_a(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
+    return toggle_lock(A_AXIS);
+}
+static Error lock_b(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
+    return toggle_lock(B_AXIS);
+}
+static Error lock_c(const char* value, WebUI::AuthenticationLevel auth_level, Channel& out) {
+    return toggle_lock(C_AXIS);
+}
 static std::string limit_set(uint32_t mask) {
     const char* motor0AxisName = "xyzabc";
     std::string s;
@@ -882,6 +908,13 @@ void make_user_commands() {
     new UserCommand("LI", "Log/Info", cmd_log_info, anyState);
     new UserCommand("LD", "Log/Debug", cmd_log_debug, anyState);
     new UserCommand("LV  ", "Log/Verbose", cmd_log_verbose, anyState);
+
+    new UserCommand("TLX", "Toggle X Axis MPG Lock", lock_x, anyState);
+    new UserCommand("TLY", "Toggle Y Axis MPG Lock", lock_y, anyState);
+    new UserCommand("TLZ", "Toggle Z Axis MPG Lock", lock_z, anyState);
+    new UserCommand("TLA", "Toggle A Axis MPG Lock", lock_a, anyState);
+    new UserCommand("TLB", "Toggle B Axis MPG Lock", lock_b, anyState);
+    new UserCommand("TLC", "Toggle C Axis MPG Lock", lock_c, anyState);
 
     new UserCommand("SLP", "System/Sleep", go_to_sleep, notIdleOrAlarm);
     new UserCommand("I", "Build/Info", get_report_build_info, notIdleOrAlarm);

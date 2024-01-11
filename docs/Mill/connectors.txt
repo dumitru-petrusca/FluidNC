@@ -1,0 +1,44 @@
+
+Step/Dir/En DB15 Connector
+==========================
+      -----------------------
+     /  ZS  ZD  YS  YD  GN   \     XS - X Step, XD - X Dir
+    /     GN  XD  GN  GN  GN  \    GN - Ground, EN - Enable
+   /    EN  GN  XS  AD  AS     \   Panel Connector Back, Cable Connector Front
+  -------------------------------
+
+3.3/5/12 VDC GX16-4 Connector
+=============================
+   ------        ------       1 - 5V
+  | 4  1 |      | 1  4 |      2 - 3.3V
+  | 3  2 |      | 2  3 |      3 - GND
+   ------        ------       4 - 12V
+  Male Front    Male Back
+  Female Back
+
+24/48/72 VDC GX20-4 Connector
+=============================
+   ------        ------       1 - 24V
+  | 4  1 |      | 1  4 |      2 - 72V
+  | 3  2 |      | 2  3 |      3 - GND
+   ------        ------       4 - 48V
+  Male Front    Male Back
+  Female Back
+
+Motor GX20-4 Connectors
+=======================
+   ------        ------       1 - A,  White
+  | 4  1 |      | 1  4 |      2 - A', Yellow
+  | 3  2 |      | 2  3 |      3 - B,  Red
+   ------        ------       4 - B', Black
+  Male Front    Male Back
+  Female Back
+
+Brake DIN-4 Connector
+=====================
+   --------     1 - NC
+  |  4  3  |    2 - NC
+  | 2    1 |    3 - 24V
+   --------     4 - GND
+     Front
+

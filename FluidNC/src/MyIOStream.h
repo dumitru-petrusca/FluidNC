@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include "Pin.h"
+#include "Types.h"
 
 std::string IP_string(uint32_t ipaddr);
 
@@ -45,6 +46,16 @@ inline Print& operator<<(Print& lhs, unsigned int v) {
 }
 
 inline Print& operator<<(Print& lhs, uint64_t v) {
+    lhs.print(v);
+    return lhs;
+}
+
+inline Print& operator<<(Print& lhs, uint8_t v) {
+    lhs.print(v);
+    return lhs;
+}
+
+inline Print& operator<<(Print& lhs, int64_t v) {
     lhs.print(v);
     return lhs;
 }

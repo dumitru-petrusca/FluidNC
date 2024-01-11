@@ -1,0 +1,16 @@
+
+Connection Diagram:
+https://mischianti.org/how-to-use-sd-card-with-esp32-2/
+
+Configuration (config.yaml):
+
+spi:
+  miso_pin: gpio.19
+  mosi_pin: gpio.23
+  sck_pin: gpio.18
+
+sdcard:
+  cs_pin: gpio.5
+  card_detect_pin: NO_PIN
+  frequency_hz: 8000000
+

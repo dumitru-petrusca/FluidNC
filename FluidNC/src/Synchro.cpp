@@ -20,7 +20,7 @@ void IRAM_ATTR encoder_isr(void* arg) {
 void synchro_init() {
     gpio_reset_pin(static_cast<gpio_num_t>(INDEX_PIN));
     gpio_mode(INDEX_PIN, true, false, false, false, false);
-    //TODO, THIS WAS CHNAGED AND NEEDS TO BE TESTED AGAIN
+    //TODO-dp, THIS WAS CHANGED AND NEEDS TO BE TESTED AGAIN
     attachInterruptArg(digitalPinToInterrupt(INDEX_PIN), encoder_isr, nullptr, RISING);
 }
 

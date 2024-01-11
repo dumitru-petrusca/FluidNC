@@ -14,7 +14,7 @@ class MacroEvent : public Event {
     int _num;
 
 public:
-    MacroEvent(int num) : _num(num) {}
+    MacroEvent(int num) : Event("MacroEvent"), _num(num) {}
     void run(void*) override;
 };
 

@@ -121,7 +121,7 @@ namespace Machine {
         if (_engine == I2S_STREAM) {
             i2s_out_set_stepping();
         } else {
-            stepTimerStart();
+            stepTimerStart(10ULL);   // Interrupt very soon to start the stepping
         }
     }
     // Called only from Stepper::stop_stepping, used in both ISR and foreground contexts

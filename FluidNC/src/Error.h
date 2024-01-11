@@ -81,6 +81,7 @@ enum class Error : uint8_t {
     UploadFailed                = 160,
     DownloadFailed              = 161,
     ReadOnlySetting             = 162,
+    NoMPGForAxis                = 162,
 };
 
 const char* errorString(Error errorNumber);

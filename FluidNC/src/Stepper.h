@@ -13,6 +13,8 @@
 
 #include <cstdint>
 
+#define DEBUG_STEPPER_ISR
+
 namespace Stepper {
     void init();
 
@@ -44,6 +46,8 @@ namespace Stepper {
 
     // Called by realtime status reporting if realtime rate reporting is enabled in config.h.
     float get_realtime_rate();
+
+    bool handle_mpgs();
 
     extern uint32_t isr_count;
 }

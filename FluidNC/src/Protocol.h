@@ -88,6 +88,7 @@ extern ArgEvent spindleOverrideEvent;
 extern ArgEvent accessoryOverrideEvent;
 extern ArgEvent limitEvent;
 extern ArgEvent faultPinEvent;
+extern ArgEvent estopPinEvent;
 
 extern ArgEvent reportStatusEvent;
 

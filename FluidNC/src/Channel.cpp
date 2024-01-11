@@ -101,6 +101,8 @@ void Channel::autoReportGCodeState() {
         _lastFeedRate     = gc_state.feed_rate;
     }
 }
+
+
 void Channel::autoReport() {
     if (_reportInterval) {
         auto probeState = config->_probe->get_state();
@@ -108,7 +110,7 @@ void Channel::autoReport() {
             report_recompute_pin_string();
         }
         if (_reportWco || sys.state != _lastState || probeState != _lastProbe || _lastPinString != report_pin_string ||
-            (motionState() && (int32_t(xTaskGetTickCount()) - _nextReportTime) >= 0)) {
+            ((int32_t(xTaskGetTickCount()) - _nextReportTime) >= 0)) {
             if (_reportWco) {
                 report_wco_counter = 0;
             }
