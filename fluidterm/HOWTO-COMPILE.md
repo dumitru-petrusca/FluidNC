@@ -3,6 +3,9 @@
 You have to do this on the host system on which you wish to run
 the executable.
 
+  pip install pyserial
+  pip install xmodem
+
   python3 -m pip install pyinstaller
   python3 -m PyInstaller --onefile fluidterm.py
 

@@ -1,0 +1,55 @@
+IM483
+
+== Current Adjust
+I = 0.002 X R(Ω)
+3A PMS, 4A peak.
+
+I   R(Ω)
+0.4 200
+0.6 301
+0.8 392
+1.0 499
+1.2 590
+1.4 698
+1.6 787
+1.8 887
+2.0 1000
+2.2 1100
+2.4 1210
+2.6 1300
+2.8 1400
+3.0 1500
+3.2 1580
+3.4 1690
+3.6 1780
+3.8 1910
+4.0 2000
+
+== Current Reduction Adjust
+Rh = 500 * I * f / (1 - f), f - reduction factor
+For f = 0.5, Rh = 500 * I. For I = 3A, R = 1.5kΩ
+
+== Microstepping
+     0123 MSEL
+8  - 1011
+10 - 0110
+16 - 0011
+
+== Connectors
+P1:1 - N/C
+P1:2 - Step
+P1:3 - Direction
+P1:4 - Opto Supply (+5)
+P1:5 - Enable
+P1:6 - Reset
+P1:7 - Fault Output
+P1:8 - On-Full-Step Output
+
+P2:8 - Motor Ø A
+P2:7 - Motor Ø
+P2:6 - Motor Ø B
+P2:5 - Motor Ø
+P2:4 - +V (12-48 VDC)
+P2:3 - GND
+P2:2 - Current Adjust (to GND)
+P2:1 - Current Reduction Adjust (to GND)

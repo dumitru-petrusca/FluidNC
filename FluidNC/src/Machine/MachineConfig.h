@@ -30,6 +30,8 @@
 #include "UserOutputs.h"
 #include "UserInputs.h"
 #include "Macros.h"
+#include "Synchro.h"
+#include "W5500.h"
 
 #include <string_view>
 
@@ -66,6 +68,7 @@ namespace Machine {
         Axes*       _axes       = nullptr;
         Kinematics* _kinematics = nullptr;
         SPIBus*     _spi        = nullptr;
+        SPIBus*     _vspi       = nullptr;
 #if MAX_N_I2C
         I2CBus* _i2c[MAX_N_I2C] = { nullptr };
 #endif
@@ -79,9 +82,11 @@ namespace Machine {
         UserOutputs*    _userOutputs = nullptr;
         UserInputs*     _userInputs  = nullptr;
         SDCard*         _sdCard      = nullptr;
+        W5500*          _w5500       = nullptr;
         Macros*         _macros      = nullptr;
         Start*          _start       = nullptr;
         Parking*        _parking     = nullptr;
+        Synchro*        _synchro        = nullptr;
 
         //        Listeners::SysListenerList _sysListeners;
         //        Spindles::SpindleList      _spindles;
@@ -106,9 +111,9 @@ namespace Machine {
         // Tracks and reports gcode line numbers. Disabled by default.
         bool _useLineNumbers = false;
 
-        std::string _board = "None";
-        std::string _name  = "None";
-        std::string _meta  = "";
+        std::string _board   = "None";
+        std::string _name    = "None";
+        std::string _meta    = "";
 #if 1
         static MachineConfig*& instance() {
             static MachineConfig* instance = nullptr;

@@ -94,9 +94,10 @@ namespace WebUI {
 
         _setupdone = false;
 
-        if (WiFi.getMode() == WIFI_OFF || !http_enable->get()) {
-            return;
-        }
+        // TODO-dp W5500
+       if ((WiFi.getMode() == WIFI_OFF && !config->_w5500->started()) || !http_enable->get()) {
+           return;
+       }
 
         _port = http_port->get();
 

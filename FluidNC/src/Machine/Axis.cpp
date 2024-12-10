@@ -12,6 +12,7 @@ namespace Machine {
         handler.item("max_travel_mm", _maxTravel, 0.1, 10000000.0);
         handler.item("soft_limits", _softLimits);
         handler.section("homing", _homing);
+        handler.section("mpg", _mpg);
 
         char tmp[7];
         tmp[0] = 0;
@@ -30,8 +31,12 @@ namespace Machine {
         }
     }
 
-    void Axis::init() {
-        uint32_t stepRate = uint32_t(_stepsPerMm * _maxRate / 60.0);
+    double Axis::maxStepRate() const {
+        return _stepsPerMm * _maxRate / 60.0;
+    }
+
+    void Axis::init(uint32_t isrRate) {
+        auto stepRate = maxStepRate();
         auto     maxRate  = Stepping::maxPulsesPerSec();
         Assert(stepRate <= maxRate, "Stepping rate %d steps/sec exceeds the maximum rate %d", stepRate, maxRate);
 
@@ -67,6 +72,10 @@ namespace Machine {
                     log_warn("  Motor" << i << " switches do not support " << (direction ? "positive" : "negative") << " homing dir");
                 }
             }
+        }
+
+        if (_mpg) {
+            _mpg->init(this, isrRate);
         }
     }
 
@@ -135,6 +144,10 @@ namespace Machine {
             }
         }
         return false;
+    }
+
+    axis_t IRAM_ATTR Axis::getAxisNum() {
+        return _axis;
     }
 
     Axis::~Axis() {

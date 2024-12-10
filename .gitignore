@@ -26,7 +26,7 @@ project.checksum
 version.cpp
 esptool*.zip
 v*.zip
-/FluidNC/data/config.yaml
+/FluidNC/data-original/config.yaml
 build/
 dist/
 *.cppx
@@ -36,6 +36,10 @@ data-wmb/
 *#
 /gcode_tests/venv
 release/
+cmake-build-debug
+.idea
+cmake-build-*
+node_modules
 managed_components/
 /FluidNC/lib/*/
 /FluidNC/dependencies.lock

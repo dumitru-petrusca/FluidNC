@@ -21,6 +21,7 @@
 
 class InputFile : public FileStream {
 private:
+    char* _active_line;
     Error _pending_error = Error::Ok;
     void  end_message();
 

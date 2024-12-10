@@ -681,6 +681,7 @@ namespace WebUI {
             }
 
             //to save time in decoding `?`
+            s << " # meta:" << config->_meta;
             s << " # axis:" << Axes::_numberAxis;
             return Error::Ok;
         }

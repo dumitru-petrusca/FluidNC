@@ -1,0 +1,40 @@
+Mazak VQC 15/40 Spindle
+=======================
+
+Travel: X-Axis 22.05"
+Y-Axis 16.14"
+Z-Axis 15"
+Table Size 35.4" x 16.14"
+Spindle Speed 60 - 6000 RPM
+Spindle Taper Cat 40
+Spindle Nose to Table Top 3.94" - 18.94"
+Spindle Motor 7.5 HP AC
+Tools 16
+Table Load Capacity 660 lbs.
+Rapid Traverse Rates (X & Y / Z) 790 / 551 IPM
+Max Tool Diameter 3.54"
+Max Tool Length 9.84"
+Max Tool Weight 17.6 lbs.
+Machine Dimensions (L x W x H) 75.9" x 92.3" x 103.5"
+Machine Weight 9240 lbs.
+
+
+The hydraulic cylinder pushes down on the fork end of the draw bar.
+This pushes down on the top of the spring stack. The bottom of the
+spring stack sits on the top of the collet sleeve. The bottom of the
+collet sleeve sits up against a shoulder inside the spindle. So yes,
+the spindle bearings do see the full force of the hydraulic cylinder
+during unclamping. In this scenario it is the top two spindle bearings
+that see the force of the unclamping. The bottom two (nearest the tool
+taper) are unaffected.
+
+As for the clamping force I am not sure. I would imagine it is the
+standard cat40 clamping force. According to
+(https://tacrockford.com/product/gauges/force-check/technical/typical-power-drawbar-clamping-forces/)
+the suggested drawbar pull force for a cat40 should be 2300lbs
+
+
+NSK 7014CTRDULP4Y ball bearings, 70x110x20
+NSK 7014CTDBB8F4
+
+

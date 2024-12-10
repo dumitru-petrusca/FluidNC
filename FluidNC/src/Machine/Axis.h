@@ -8,12 +8,15 @@
 // #include "Axes.h"
 #include "Motor.h"
 #include "Homing.h"
+#include "MPG.h"
 
 namespace MotorDrivers {
     class MotorDriver;
 }
 
 namespace Machine {
+    class MPG;
+
     class Axis : public Configuration::Configurable {
         axis_t  _axis;
         motor_t motorsWithSwitches();
@@ -29,6 +32,7 @@ namespace Machine {
 
         Motor*  _motors[MAX_MOTORS_PER_AXIS];
         Homing* _homing = nullptr;
+        MPG*    _mpg    = nullptr;
 
         float _stepsPerMm   = 80.0f;
         float _maxRate      = 1000.0f;
@@ -47,9 +51,12 @@ namespace Machine {
         float commonPulloff();
         float extraPulloff();
 
-        void init();
-        void config_motors();
-        bool can_home();
+        void     init(uint32_t isrRate);
+        [[nodiscard]] double maxStepRate() const;
+        void     config_motors();
+        bool     can_home();
+
+        axis_t getAxisNum();
 
         ~Axis();
     };

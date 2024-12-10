@@ -20,6 +20,7 @@
 #include "Machine/MachineConfig.h"
 #include "Parameters.h"
 #include "Flowcontrol.h"
+#include "Machine/Synchro.h"
 
 #include <string.h>  // memset
 #include <math.h>    // sqrt etc.
@@ -418,6 +419,17 @@ Error gc_execute_line(const char* input_line) {
                         gc_block.modal.motion = Motion::CcwArc;
                         mg_word_bit           = ModalGroup::MG1;
                         break;
+                    case 32:  // G32 - single point threading
+                        if (!config->_synchro->exists()) {
+                            log_info("No index pin defined, G32 not supported.");
+                            return Error::GcodeUnsupportedCommand;  // [Unsupported G command]
+                        }
+                        axis_command          = AxisCommand::MotionMode;
+                        gc_block.modal.motion = Motion::LinearSynchro;
+                        mg_word_bit           = ModalGroup::MG1;
+                        gc_block.values.f     = (float)(sys.pitch() * config->_synchro->spindle_rpm());
+                        value_words |= bitnum_to_mask(GCodeWord::F);  // required for the feed to take effect
+                        break;
                     case 38:  // G38 - probe
                         //only allow G38 "Probe" commands if a probe pin is defined.
                         if (!config->_probe->exists()) {
@@ -785,6 +797,9 @@ Error gc_execute_line(const char* input_line) {
                     case 'F':
                         axis_word_bit     = GCodeWord::F;
                         gc_block.values.f = value;
+                        if (config->_synchro->exists()) {
+                            sys.set_pitch(value);
+                        }
                         break;
                     // case 'H': // Not supported
                     case 'I':
@@ -1337,6 +1352,7 @@ Error gc_execute_line(const char* input_line) {
                 case Motion::Seek:
                     break;  // Feed rate is unnecessary
                 case Motion::Linear:
+                case Motion::LinearSynchro:
                     // [G1 Errors]: Feed rate undefined. Axis letter not configured or without real value.
                     // Axis words are optional. If missing, set axis command flag to ignore execution.
                     if (!axis_words) {
@@ -1882,6 +1898,8 @@ Error gc_execute_line(const char* input_line) {
             GCUpdatePos gc_update_pos = GCUpdatePos::Target;
             if (gc_state.modal.motion == Motion::Linear) {
                 mc_linear(gc_block.values.xyz, pl_data, gc_state.position);
+            } else if (gc_state.modal.motion == Motion::LinearSynchro) {
+                mc_linear_synchro(gc_block.values.xyz, pl_data, gc_state.position);
             } else if (gc_state.modal.motion == Motion::Seek) {
                 pl_data->motion.rapidMotion = 1;  // Set rapid motion flag.
                 mc_linear(gc_block.values.xyz, pl_data, gc_state.position);

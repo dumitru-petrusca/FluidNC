@@ -1,0 +1,53 @@
+Booting a new ESP32
+===================
+1. Write the software into the ESP32. Online installer: https://installer.fluidnc.com/files.
+2. Start Fluidterm (from IJ or " python fluidterm.py /dev/cu.SLAB_USBtoUART ")
+3. Set the WiFi config. Input these commands one by one.
+    $Hostname=mill (or mill or lathe)
+    $WiFi/Mode=STA
+    $Sta/SSID=superhawk-2.4
+    $Sta/Password=<the password>
+    $Sta/IPMode=DHCP (or DHCP)
+    $Sta/IP=10.0.0.121 (mill) $Sta/IP=10.0.0.120 (lathe)
+    $Sta/Gateway=10.0.0.1
+    $Sta/Netmask=255.255.255.0
+4. Restart Fluidterm, check that it connected to network
+5. Navigate to mDNS URL, http://fluidnc.local, http://lathe.local, http://mill.local
+6. Upload config and UI
+7. Restart ESP32
+
+
+Fluidterm
+==================================
+1. pip install pyserial
+2. pip install xmodem
+3. python ./fluidterm/fluidterm.py
+
+
+Check contents of local filesystem
+==================================
+1. Start Fluidterm (python ./fluidterm/fluidterm.py /dev/cu.SLAB_USBtoUART)
+2. List files with: $LocalFS/List
+3. Display a file with: $LocalFS/Show=config.yaml
+
+
+Upload the local filesystem to the ESP32
+============================================
+1. Put all required files in FluidNC/data
+2. Run: pio run --target uploadfs
+
+
+Router & IP Information
+=======================
+Router IP: 10.0.0.1 (admin/j)
+Device Name    MAC Address         IP           Use
+===========    ===========         ==           ===
+esp32-693994   10:52:1C:69:39:94   10.0.0.120   Lathe
+esp32-?        d4:8a:fc:a0:5c:a8   10.0.0.121   Mill
+esp32-80182C   78:21:84:80:18:2C   10.0.0.122   Demo
+
+
+ESP32 Board Information
+=======================
+esptool.py -p  /dev/cu.SLAB_USBtoUART flash_id
+esptool: https://docs.espressif.com/projects/esptool/en/latest/esp32

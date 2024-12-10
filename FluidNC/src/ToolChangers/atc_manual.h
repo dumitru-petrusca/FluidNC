@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cfloat>
 #include "Config.h"
 
 #include "Configuration/Configurable.h"
@@ -26,11 +27,11 @@ namespace ATCs {
 
     private:
         // config items
-        float              _safe_z           = 50.0;
+        float              _safe_z           = FLT_MIN; // TODO-dp was 50.0
         float              _probe_seek_rate  = 200.0;
         float              _probe_feed_rate  = 80.0;
-        std::vector<float> _ets_mpos         = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-        std::vector<float> _change_mpos      = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };  // manual tool change location
+        std::vector<float> _ets_mpos         = { FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN };
+        std::vector<float> _change_mpos      = { FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN };  // manual tool change location
         float              _ets_rapid_z_mpos = 0;
 
         bool   _is_OK                   = false;
@@ -62,5 +63,8 @@ namespace ATCs {
             handler.item("ets_mpos_mm", _ets_mpos);
             handler.item("ets_rapid_z_mpos_mm", _ets_rapid_z_mpos);
         }
+        bool has_tool_setter();
+        bool has_safe_z();
+        bool has_change_location();
     };
 }

@@ -94,11 +94,12 @@ public:
 
     // Configurable
 
-    uint8_t _address = 0x3c;
+    uint8_t     _address = 0x3c;
     int32_t _width   = 64;
     int32_t _height  = 48;
-    bool    _flip    = true;
-    bool    _mirror  = false;
+    bool        _flip    = true;
+    bool        _mirror  = false;
+    std::string _type    = "SSD1306";
 
     // Channel method overrides
     size_t write(uint8_t data) override;
@@ -125,6 +126,7 @@ public:
         handler.item("height", _height);
         handler.item("flip", _flip);
         handler.item("mirror", _mirror);
+        handler.item("type", _type);
         handler.item("radio_delay_ms", _radio_delay);
     }
 };

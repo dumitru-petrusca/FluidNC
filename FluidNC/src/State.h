@@ -19,6 +19,7 @@ enum class State : uint8_t {
     ConfigAlarm,  // You can't do anything but fix your config file.
     Critical,     // You can't do anything but reset with CTRL-x or the reset button
     Starting,     // Initial startup
+    Sync,         // Waiting for index pulse from the spindle
 };
 
 void set_state(State s);

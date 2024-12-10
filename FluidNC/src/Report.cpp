@@ -26,6 +26,7 @@
 #include "WebUI/NotificationsService.h"  // WebUI::notificationsService
 #include "InputFile.h"
 #include "Job.h"
+#include "Machine/Synchro.h"
 
 #include <map>
 #include <freertos/task.h>
@@ -234,6 +235,9 @@ void report_gcode_modes(Channel& channel) {
             break;
         case Motion::CcwArc:
             msg << "G3";
+            break;
+        case Motion::LinearSynchro:
+            msg << "G32";
             break;
         case Motion::ProbeToward:
             msg << "G38.2";
@@ -449,6 +453,8 @@ const char* state_name() {
             return "Sleep";
         case State::Starting:
             return "Starting";
+        case State::Sync:
+            return "Sync";
         default:  // Held or Starting
             break;
     }
@@ -528,6 +534,11 @@ void report_realtime_status(Channel& channel) {
     }
     msg << "|FS:" << setprecision(0) << rate << "," << sys.spindle_speed();
 
+    if (config->_synchro->exists()) {
+        msg << "|RPM:" << setprecision(1) << config->_synchro->spindle_rpm();
+        msg << "|P:" << setprecision(3) << sys.pitch();
+    }
+
     if (report_pin_string.length()) {
         msg << "|Pn:" << report_pin_string;
     }
@@ -599,6 +610,17 @@ void report_realtime_status(Channel& channel) {
     if (Job::active()) {
         msg << "|" << Job::channel()->_progress;
     }
+
+    auto    n_axis    = config->_axes->_numberAxis;
+    uint8_t mpg_state = 0;
+    for (int axis = 0; axis < n_axis; axis++) {
+        MPG* mpg = config->_axes->_axis[axis]->_mpg;
+        if (mpg != nullptr && !mpg->_locked) {
+            mpg_state |= bitnum_to_mask(axis);
+        }
+    }
+    msg << "|MPG:" << mpg_state;
+
 #ifdef DEBUG_STEPPER_ISR
     msg << "|ISRs:" << Stepper::isr_count;
 #endif

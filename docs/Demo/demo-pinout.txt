@@ -1,0 +1,55 @@
+ESP 32 DEVKIT V1 PINS
+=====================
+
+                  |------------WIFI----------|
+        |         |EN |                  |23 | SD MOSI |
+I       |         |36 |VP                |22 | ET MOSI |
+I       |         |39 |VN             TX0|1  |  STM32  | ↑DEBUG OUT
+I       |         |34 |               RX0|3  |  STM32  | ↑HIGH
+I       |         |35 |                  |21 | ET MISO |
+        | MPG A   |32 |                  |19 | SD MISO |
+        | MPG B   |33 |                  |18 | SD SCK  |
+        |         |25 |                  |5  | SD CS   | ↑PWM
+        |         |26 |               TX2|17 | ET SCK  |
+        | I2SO CK |27 |               RX2|16 | ET CS   |
+↓BOOT   | I2SO WS |14 |                  |4  |         | ↓
+↓       |         |12 |                  |2  |         | ↓FLASH
+        | I2SO DS |13 |                  |15 | ET INT  | ↑PWM BOOT
+        |         |GND|                  |GND|         |
+        |         |5V0|                  |3V3|         |
+                  |-------------USB----------|
+
+Pin In   Out  Notes
+=== ==== ==   =====
+0   high OK   outputs PWM signal at boot, must be LOW to enter flashing mode
+1   TX   OK   debug output at boot. Used for serial terminal. Terminal will not work if this pin is used.
+2   OK   OK   connected to on-board LED, must be left floating or LOW to enter flashing mode
+3   OK   RX   pin HIGH at boot. Used for serial terminal. Terminal will not work if this pin is used.
+4   OK   OK
+5   OK   OK   outputs PWM signal at boot, strapping pin
+6   x    x    connected to the integrated SPI flash
+7   x    x    connected to the integrated SPI flash
+8   x    x    connected to the integrated SPI flash
+9   x    x    connected to the integrated SPI flash
+10  x    x    connected to the integrated SPI flash
+11  x    x    connected to the integrated SPI flash
+12  OK   OK   boot fails if pulled high, strapping pin
+13  OK   OK
+14  OK   OK   outputs PWM signal at boot
+15  OK   OK   outputs PWM signal at boot, strapping pin
+16  OK   OK
+17  OK   OK
+18  OK   OK
+19  OK   OK
+21  OK   OK
+22  OK   OK
+23  OK   OK
+25  OK   OK
+26  OK   OK
+27  OK   OK
+32  OK   OK
+33  OK   OK
+34  OK   x    input only
+35  OK   x    input only
+36  OK   x    input only
+39  OK   x    input only

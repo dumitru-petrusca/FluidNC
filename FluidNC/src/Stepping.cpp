@@ -61,7 +61,7 @@ namespace Machine {
 
         uint32_t actual = step_engine->init(_directionDelayUsecs, _pulseUsecs, fStepperTimer, Stepper::pulse_func);
         if (actual != _pulseUsecs) {
-            log_warn("stepping/pulse_us adjusted to " << actual);
+            log_warn("stepping/pulse_us adjusted from " << _pulseUsecs << " to " << actual);
         }
 
         // Register pulse_func with the I2S subsystem
@@ -162,7 +162,7 @@ void IRAM_ATTR Stepping::step(AxisMask step_mask, AxisMask dir_mask) {
             axis_steps[axis] += increment;
             for (size_t motor = 0; motor < MAX_MOTORS_PER_AXIS; motor++) {
                 auto m = axis_motors[axis][motor];
-                if (m && !m->blocked && !m->limited) {
+                if (m && !m->blocked && (!m->limited || sys.mpg_mode())) {
                     step_engine->set_step_pin(m->step_pin, !m->step_invert);
                 }
             }

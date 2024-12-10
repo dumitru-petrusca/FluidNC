@@ -1,0 +1,63 @@
+Main Diagram: https://app.diagrams.net/#G1moxmIYquECVwP85fCw_oOQGxyNG3VhBI
+
+
+Power Box
+=========
+  Name              In/Out    Connector   Pins
+  ============================================
+  120V AC           In         Power      (L, N, GND)
+  24/48/72 VDC      Out        GX20-4     (24V, 48V, 72V, GND)  To Motor Box
+  3.3/5/12 VDC      Out        GX16-4     (3V3, 5V, 12V, GND)  To Motor Box
+  3.3/5/12 VDC      Out        GX16-4     (3V3, 5V, 12V, GND)  To Control Box
+
+
+Control Box
+===========
+  Name                In/Out    Connector  Pins
+  =============================================
+  3.3/5/12 VDC        In        GX16-4     (3V3, 5V, 12V, GND)
+  X Limit Switch      In        USB        (3V3, Limit 1, Limit 2, GND)
+  Y Limit Switch      In        USB        (3V3, Limit 1, Limit 2, GND)
+  Z Limit Switch      In        USB        (3V3, Limit 1, Limit 2, GND)
+  X MPG               In        USB        (3V3, A, B, GND)
+  Y MPG               In        USB        (3V3, A, B, GND)
+  Z MPG               In        USB        (3V3, A, B, GND)
+  Programming Port    In/Out    USB        (3V3, D+, D-, GND)
+  Programming Switch            switch     2 channel, connect pin 0 and 2 to GND
+  Wifi Antenna        In/Out    U.FL/IPEX
+  Step/Dir/En         Out       DB15       (4 Step, 4 Dir, En, 6 GND)
+  E-Stop              In/Out    USB        (3V3, 5V IN, 5V OUT, GND)
+  VFD                 Out       USB        (3V3, 485+, 485-, GND)
+
+  Programming Port (USB)
+  ======================
+  VCC D+  D-  GND
+  R   W   G   B    - Panel connector
+  Y   R   G   B    - Micro USB cable
+
+Motor Driver Box
+================
+  Name              In/Out    Connector   Pins
+  ============================================
+  24/48/72 VDC      In        GX20-4     (24V, 48V, 72V, GND)
+  3.3/5/12 VDC      In        GX16-4     (3V3, 5V, 12V, GND)
+  Step/Dir/En       In        DB15       (4 Step, 4 Dir, En, GND)
+  X Motor           Out       GX20-4     (A, A', B, B')
+  Y Motor           Out       GX20-4     (A, A', B, B')
+  Z Motor           Out       GX20-4     (A, A', B, B')
+  A Motor           Out       GX20-4     (A, A', B, B')
+  Z Brake           Out       DIN-4      (24V, GND)
+
+
+E-Stop System
+=============
+  Disable motor drivers   -  short Disable pins to GND,  TODO can they be connected together?
+  Activate Z motor brake  -  cut 24V power to it
+  Disable spindle VFD     -  trigger Emergency function on VFD
+
+
+Current Budget
+=============
+  Spindle: 14A @ 240V, 3kW, 90% efficiency
+  Motors:  11A @ 120V, 4*6A*72V*0.67 = 1158W, 90% efficiency
+

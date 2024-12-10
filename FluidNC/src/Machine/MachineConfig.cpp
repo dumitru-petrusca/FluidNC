@@ -59,6 +59,9 @@ namespace Machine {
         handler.section("sdcard", _sdCard);
 #endif
 
+        handler.section("vspi", _vspi);
+        handler.section("w5500", _w5500);
+
         handler.section("kinematics", _kinematics);
         handler.section("axes", _axes);
 
@@ -72,6 +75,8 @@ namespace Machine {
 
         handler.section("user_outputs", _userOutputs);
         handler.section("user_inputs", _userInputs);
+
+        handler.section("synchro", _synchro);
 
         ConfigurableModuleFactory::factory(handler);
         ATCs::ATCFactory::factory(handler);
@@ -126,6 +131,15 @@ namespace Machine {
         }
 #endif
 
+        if (_vspi == nullptr) {
+            _vspi = new SPIBus();
+        }
+        _vspi->_host_id = VSPI_HOST;
+
+        if (_w5500 == nullptr) {
+            _w5500 = new W5500();
+        }
+
         if (_stepping == nullptr) {
             _stepping = new Stepping();
         }
@@ -143,6 +157,10 @@ namespace Machine {
 
         if (_parking == nullptr) {
             _parking = new Parking();
+        }
+
+        if (_synchro == nullptr) {
+            _synchro = new Synchro();
         }
 
         auto spindles = Spindles::SpindleFactory::objects();
@@ -179,6 +197,9 @@ namespace Machine {
             set_state(State::ConfigAlarm);
         } else {
             load_file(config_filename->get());
+            if (state_is(State::ConfigAlarm)) {
+                abort();  // Cause a panic so that we load the default config
+            }
         }
     }
 

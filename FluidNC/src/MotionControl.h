@@ -18,6 +18,9 @@ extern bool probe_succeeded;  // Tracks if last probing cycle was successful.
 // Execute a linear motion in cartesian space.
 bool mc_linear(float* target, plan_line_data_t* pl_data, float* position);
 
+// Execute linear motion synchronized to spindle rotation. Used for threading.
+void mc_linear_synchro(float* target, plan_line_data_t* pl_data, float* position);
+
 // Execute a linear motion in motor space.
 bool mc_move_motors(float* target, plan_line_data_t* pl_data);  // returns true if line was submitted to planner
 

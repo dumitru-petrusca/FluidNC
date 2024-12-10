@@ -1,0 +1,17 @@
+H100-3S2-1B
+===========
+
+Register	Function Description	  Value
+========  ====================    =====
+F000	    Parameter lock	        0
+F001	    Control Mode	          0 : keyboard
+F002	    Freq Selection	        0 : keyboard
+F003	    Main frequency          50
+F004      Reference frequency     60
+F005	    Max frequency	          400
+F006      Intermediate frequency  ?
+F007	    Min frequency	          20
+F008      Max Voltage             220
+F009      Intermediate Voltage    15
+F010      Low frequency torque    ?
+F041      Carrier frequency       6 (7kHz)

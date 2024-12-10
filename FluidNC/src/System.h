@@ -67,6 +67,8 @@ public:
 class system_t {
 protected:
     volatile State state_;              // Tracks the current system state
+    volatile bool  mpg_mode_;           // Controls whether the system is currently in MPG model or not
+    float          pitch_;
     bool           abort_;              // System abort flag. Forces exit back to main loop for reset.
     Suspend        suspend_;            // System suspend bitflag variable that manages holds, cancels, and safety door.
     Percent        f_override_;         // Feed rate override value in percent
@@ -113,6 +115,16 @@ public:
              dirty_ = SystemDirty(int(dirty_) | int(SystemDirty::State));
              state_ = value;
         }
+    }
+
+    bool IRAM_ATTR mpg_mode() const { return mpg_mode_; }
+    void IRAM_ATTR  set_mpg_mode(bool value) {
+        mpg_mode_ = value;
+    }
+
+    float IRAM_ATTR pitch() const { return pitch_; }
+    void IRAM_ATTR  set_pitch(float value) {
+        pitch_ = value;
     }
 
     bool IRAM_ATTR abort() const { return abort_; }

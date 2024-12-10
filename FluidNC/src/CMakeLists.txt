@@ -46,6 +46,7 @@ idf_component_register(SRCS BTConfig.cpp
 							string_util.cpp
 							System.cpp
 							Uart.cpp
+							W5500.cpp
 							UartChannel.cpp
 							UTF8.cpp
 							xmodem.cpp

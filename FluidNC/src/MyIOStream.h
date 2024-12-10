@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include "Types.h"
 
 std::string IP_string(uint32_t ipaddr);
 
@@ -45,8 +46,18 @@ inline Print& operator<<(Print& lhs, Enum v) {
     return lhs;
 }
 
+inline Print& operator<<(Print& lhs, uint8_t v) {
+    lhs.print(v);
+    return lhs;
+}
+
+inline Print& operator<<(Print& lhs, int64_t v) {
+    lhs.print(v);
+    return lhs;
+}
+
 inline Print& operator<<(Print& lhs, float v) {
-    lhs.print(v, 3);
+    lhs.print(v, 5);
     return lhs;
 }
 

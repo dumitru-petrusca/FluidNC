@@ -53,7 +53,8 @@ namespace Machine {
 
     void LimitPin::trigger(bool active) {
         if (active) {
-            if (Homing::approach() || (!state_is(State::Homing) && _pHardLimits)) {
+            // Do not limit in MPG mode, the MPG does the limiting in this case.
+            if (!sys.mpg_mode() && (Homing::approach() || (!state_is(State::Homing) && _pHardLimits))) {
                 if (_pLimited != nullptr) {
                     *_pLimited = active;
                 }

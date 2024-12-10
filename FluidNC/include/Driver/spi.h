@@ -4,8 +4,8 @@
 #include "Pins/PinDetail.h"  // pinnum_t
 #include "driver/spi_master.h"
 
-bool spi_init_bus(pinnum_t sck_pin, pinnum_t miso_pin, pinnum_t mosi_pin, bool dma, int8_t sck_drive_strength, int8_t mosi_drive_strength);
-void spi_deinit_bus();
+bool spi_init_bus(spi_host_device_t host_id, pinnum_t sck_pin, pinnum_t miso_pin, pinnum_t mosi_pin, bool dma, int8_t sck_drive_strength, int8_t mosi_drive_strength);
+void spi_deinit_bus(spi_host_device_t host_id);
 
 // Returns devid or -1
 spi_device_t spi_register_device(pinnum_t cs_pin);

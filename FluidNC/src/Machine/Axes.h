@@ -87,9 +87,13 @@ namespace Machine {
 
         static std::string motorMaskToNames(MotorMask mask);
 
+        static uint32_t compute_max_step_rate();
+
         // Configuration helpers:
-        void group(Configuration::HandlerBase& handler) override;
-        void afterParse() override;
+        void        group(Configuration::HandlerBase& handler) override;
+        void        afterParse() override;
+        static bool has_mpgs();
+        static void reset_mpgs();
 
         ~Axes();
     };

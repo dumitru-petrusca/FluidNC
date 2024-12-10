@@ -37,7 +37,8 @@ Error InputFile::readLine(char* line, size_t maxlen) {
 
 void InputFile::ack(Error status) {
     if (status != Error::Ok) {
-        log_error(static_cast<int>(status) << " (" << errorString(status) << ") in " << name() << " at line " << lineNumber());
+        log_error("Error " << static_cast<int>(status) << " (" << errorString(status) << ") in " << name()
+                                           << " at line " << lineNumber() << ": " << _active_line);
         if (status != Error::GcodeUnsupportedCommand) {
             // Do not stop on unsupported commands because most senders do not stop.
             // Stop the file job on other errors
@@ -80,6 +81,7 @@ Error InputFile::pollLine(char* line) {
         end_message();
         return Error::Eof;
     }
+    _active_line = line;
     switch (auto err = readLine(line, Channel::maxLine)) {
         case Error::Ok: {
             float percent_complete = ((float)position()) * 100.0f / size();

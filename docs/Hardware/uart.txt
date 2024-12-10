@@ -1,0 +1,13 @@
+RTS - Request To Send (high = send, low = receive)
+RxD - Receive Data
+TxD - Transmit Data
+
+MAX485
+======
+RO - Receiver Output.
+RE - Receiver Output Enable. RO is enabled when RE is low.
+DE - Driver Output Enable. The driver outputs are enabled when DE is high.
+DI - Driver Input.
+
+RO - RxD - 25
+DI - TxD - 27

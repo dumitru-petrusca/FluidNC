@@ -76,6 +76,7 @@ enum class NonModal : gcodenum_t {
 enum class Motion : gcodenum_t {
     Seek               = 00,   // G0 Default
     Linear             = 10,   // G1
+    LinearSynchro      = 11,   // G32
     CwArc              = 20,   // G2
     CcwArc             = 30,   // G3
     ProbeToward        = 382,  // G38.2
@@ -283,6 +284,7 @@ struct gc_modal_t {
 struct gc_values_t {
     uint8_t  e;                // {M66,M67}
     float    f;                // Feed
+    float    pitch;            // Thread pitch for G32
     float    ijk[3];           // I,J,K Axis arc offsets - only 3 are possible
     uint8_t  l;                // {M66,G10}, or canned cycles parameters
     int32_t  n;                // Line number

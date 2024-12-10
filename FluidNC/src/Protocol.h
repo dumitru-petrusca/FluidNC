@@ -47,6 +47,8 @@ void protocol_cancel_disable_steppers();
 
 void protocol_do_motion_cancel();
 
+void enter_mpg_mode();
+
 extern volatile bool rtCycleStop;
 
 extern volatile bool runLimitLoop;

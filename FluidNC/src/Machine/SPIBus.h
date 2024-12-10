@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Configuration/Configurable.h"
+#include "driver/spi_common.h"
 
 namespace Machine {
     class SPIBus : public Configuration::Configurable {
@@ -14,6 +15,7 @@ namespace Machine {
         Pin _miso;
         Pin _mosi;
         Pin _sck;
+        spi_host_device_t _host_id = HSPI_HOST;
 
         void validate() override;
         void group(Configuration::HandlerBase& handler) override;

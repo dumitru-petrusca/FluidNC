@@ -96,7 +96,9 @@ uint32_t Channel::setReportInterval(uint32_t ms) {
     return actual;
 }
 static bool motionState() {
-    return state_is(State::Cycle) || state_is(State::Homing) || state_is(State::Jog);
+    //TODO-dp
+//    return sys.mpg_mode || state_is(State::Cycle) || state_is(State::Homing) || state_is(State::Jog);
+    return true;
 }
 
 void Channel::autoReportGCodeState() {

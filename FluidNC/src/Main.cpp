@@ -23,6 +23,8 @@
 #    include "Driver/localfs.h"
 
 #    include "ToolChangers/atc.h"
+#    include "Machine/Synchro.h"
+#    include "Driver/fluidnc_gpio.h"
 
 extern void make_user_commands();
 
@@ -61,8 +63,7 @@ void setup() {
 
         make_user_commands();
 
-        log_info("Machine " << config->_name);
-        log_info("Board " << config->_board);
+        log_info("Name: " << config->_name << ", Board: " + config->_board);
 
         // The initialization order reflects dependencies between the subsystems
         for (size_t i = 1; i < MAX_N_UARTS; i++) {
@@ -92,6 +93,14 @@ void setup() {
 #        endif
         }
 #    endif
+
+    if (config->_vspi) {
+        config->_vspi->init();
+
+        if (config->_w5500 != nullptr) {
+            config->_w5500->init();
+        }
+    }
 
 #    if MAX_N_I2C
         for (size_t i = 0; i < MAX_N_I2C; i++) {
@@ -153,6 +162,8 @@ void setup() {
         }
 
         make_proxies();
+
+        config->_synchro->init();
 
     } catch (std::exception& ex) {
         // Log exception:

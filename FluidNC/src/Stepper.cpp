@@ -195,13 +195,17 @@ bool IRAM_ATTR Stepper::pulse_func() {
     isr_count++;
 #endif
     // This is a precaution in case we get a spurious interrupt
-    if (!awake) {
+    if (!sys.mpg_mode() && !awake) {
         return false;
     }
     auto n_axis = Axes::_numberAxis;
 
     Stepping::step(st.step_outbits, st.dir_outbits);
     st.step_outbits = 0;
+
+    if (sys.mpg_mode()) {
+        return handle_mpgs();
+    }
 
     // If there is no step segment, attempt to pop one from the stepper buffer
     if (st.exec_segment == NULL) {
@@ -261,6 +265,29 @@ bool IRAM_ATTR Stepper::pulse_func() {
         // Segment is complete. Discard current segment and advance segment indexing.
         st.exec_segment     = NULL;
         segment_buffer_tail = segment_buffer_tail >= (Stepping::_segments - 1) ? 0 : segment_buffer_tail + 1;
+    }
+
+    Stepping::unstep();
+    return true;
+}
+
+bool IRAM_ATTR Stepper::handle_mpgs() {
+    // Reset step and dir out bits.
+    st.step_outbits = 0;
+
+    for (int axis = 0; axis < Axes::_numberAxis; axis++) {
+        MPG* mpg = Axes::_axis[axis]->_mpg;
+        if (mpg != nullptr) {
+            const int32_t step = mpg->getStep();
+            // Generate step and direction pulses
+            if (step > 0) {
+                clear_bitnum(st.dir_outbits, axis);  // CW
+                set_bitnum(st.step_outbits, axis);
+            } else if (step < 0) {
+                set_bitnum(st.dir_outbits, axis);  // CCW
+                set_bitnum(st.step_outbits, axis);
+            }
+        }
     }
 
     Stepping::unstep();

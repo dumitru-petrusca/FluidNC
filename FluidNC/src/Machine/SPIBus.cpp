@@ -38,7 +38,7 @@ namespace Machine {
             log_info("Using default SPI pins");
         }
         // Init in DMA mode
-        if (!spi_init_bus(sckPin, misoPin, mosiPin, true, _sck.driveStrength(), _mosi.driveStrength())) {
+        if (!spi_init_bus(_host_id, sckPin, misoPin, mosiPin, true, _sck.driveStrength(), _mosi.driveStrength())) {
             log_error("SPIBus init failed");
             return;
         }
@@ -46,7 +46,7 @@ namespace Machine {
     }
 
     void SPIBus::deinit() {
-        spi_deinit_bus();
+        spi_deinit_bus(_host_id);
     }
 
     void SPIBus::group(Configuration::HandlerBase& handler) {

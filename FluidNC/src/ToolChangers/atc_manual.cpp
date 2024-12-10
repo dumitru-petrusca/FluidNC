@@ -117,8 +117,10 @@ namespace ATCs {
                 _macro.addf("M5");
             }
 
+            bool has_ets = has_tool_setter();
+
             // if we have not determined the tool setter offset yet, we need to do that.
-            if (!_have_tool_setter_offset) {
+            if (!_have_tool_setter_offset && has_ets) {
                 move_over_toolsetter();
                 ets_probe();
                 _macro.addf("#<_ets_tool1_z>=[#5063]");  // save the value of the tool1 ETS Z
@@ -132,13 +134,15 @@ namespace ATCs {
             _macro.addf("M0");
 
             // probe the new tool
-            move_to_safe_z();
-            move_over_toolsetter();
-            ets_probe();
+            if (has_ets) {
+                move_to_safe_z();
+                move_over_toolsetter();
+                ets_probe();
 
-            // TLO is simply the difference between the tool1 probe and the new tool probe.
-            _macro.addf("#<_my_tlo_z >=[#5063 - #<_ets_tool1_z>]");
-            _macro.addf("G43.1Z#<_my_tlo_z>");
+                // TLO is simply the difference between the tool1 probe and the new tool probe.
+                _macro.addf("#<_my_tlo_z >=[#5063 - #<_ets_tool1_z>]");
+                _macro.addf("G43.1Z#<_my_tlo_z>");
+            }
 
             move_to_safe_z();
 
@@ -171,12 +175,16 @@ namespace ATCs {
     }
 
     void Manual_ATC::move_to_change_location() {
-        move_to_safe_z();
-        _macro.addf("G53G0X%0.3fY%0.3fZ%0.3f", _change_mpos[0], _change_mpos[1], _change_mpos[2]);
+        if (has_change_location()) {
+            move_to_safe_z();
+            _macro.addf("G53G0X%0.3fY%0.3fZ%0.3f", _change_mpos[0], _change_mpos[1], _change_mpos[2]);
+        }
     }
 
     void Manual_ATC::move_to_safe_z() {
-        _macro.addf("G53G0Z%0.3f", _safe_z);
+        if (has_safe_z()) {
+            _macro.addf("G53G0Z%0.3f", _safe_z);
+        }
     }
 
     void Manual_ATC::move_over_toolsetter() {
@@ -195,6 +203,28 @@ namespace ATCs {
 
         // do the feed rate probe
         _macro.addf("G53 G38.2 Z%0.3f F%0.3f", _ets_mpos[2], _probe_feed_rate);
+    }
+
+    bool Manual_ATC::has_tool_setter() {
+        for (const auto& coord : _ets_mpos) {
+            if (coord == FLT_MIN) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool Manual_ATC::has_change_location() {
+        for (const auto& coord : _change_mpos) {
+            if (coord == FLT_MIN) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool Manual_ATC::has_safe_z() {
+        return _safe_z != FLT_MIN;
     }
 
     namespace {

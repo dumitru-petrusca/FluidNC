@@ -1,0 +1,15 @@
+
+Important:
+==========
+
+
+Mill:
+=============
+- Add support for G43 (tool length compensation)
+  - Add EnableTable to GCOde.h/ToolLengthOffset
+
+
+Lathe:
+=============
+- Add some way to control whether the machine is a lathe or a mill
+- Add support for G95 for feed rate in units/rev (https://linuxcnc.org/docs/html/gcode/g-code.html#gcode:g93-g94-g95)

@@ -20,6 +20,7 @@
 #include "Job.h"
 #include "Driver/restart.h"
 #include "Driver/watchdog.h"
+#include "Driver/StepTimer.h"
 
 volatile ExecAlarm lastAlarm;  // The most recent alarm code
 
@@ -57,6 +58,8 @@ static volatile bool rtSafetyDoor;
 volatile bool runLimitLoop;  // Interface to show_limits()
 
 static void protocol_exec_rt_suspend();
+
+bool state_allows_mpgs();
 
 // Spindle stop override control states.
 struct SpindleStopBits {
@@ -185,7 +188,7 @@ void polling_loop(void* unused) {
                         if (Job::leader) {
                             log_error_to(*Job::leader,
                                          static_cast<int>(status) << " (" << errorString(status) << ") in " << channel->name()
-                                                                  << " at line " << channel->lineNumber());
+                                                                  << " at line " << channel->lineNumber() << ": " << activeLine);
                         }
                         Job::abort();
                         break;
@@ -237,6 +240,25 @@ uint32_t heapLowWater           = UINT_MAX;
 uint32_t heapLowWaterReported   = UINT_MAX;
 int32_t  heapLowWaterReportTime = 0;
 
+void enter_mpg_mode() {
+    if (Axes::has_mpgs() && state_allows_mpgs() && plan_get_current_block() == nullptr) {
+        uint32_t   max_step_rate = Axes::compute_max_step_rate();
+        const auto period        = static_cast<uint64_t>(Stepping::fStepperTimer / float(max_step_rate));
+        Axes::reset_mpgs();
+        protocol_cancel_disable_steppers();
+        Axes::set_disable(false);
+        sys.set_mpg_mode(true);
+        Stepping::startTimer();
+        Stepping::setTimerPeriod(period);
+        //        log_info("Entered MPG mode with period " << period);
+    }
+}
+
+bool state_allows_mpgs() {
+    // Hold (M0) is the state while waiting for a tool change
+    return sys.state() == State::Idle || sys.state() == State::Hold || sys.state() == State::Critical;
+}
+
 void protocol_main_loop() {
     add_watchdog_to_task();
     start_polling();
@@ -246,10 +268,24 @@ void protocol_main_loop() {
     // This is also where the system idles while waiting for something to do.
     // ---------------------------------------------------------------------------------
     for (;; vTaskDelay(1)) {
+        bool restore_mpg_mode = false;
+
         if (activeChannel) {
             // The input polling task has collected a line of input
             if (gcode_echo->get()) {
                 report_echo_line_received(activeLine, allChannels);
+            }
+
+            // Stop the MPGs, if running, and sync the parser's and planer's positions
+            if (sys.mpg_mode()) {
+                //                log_info("Sync MPG Position...");
+                restore_mpg_mode = true;
+                // stop the ISR
+                sys.set_mpg_mode(false);
+                delay_ms(10);  // TODO-dp, wait for the ISR to actually die
+                // sync positions
+                gc_sync_position();
+                plan_sync_position();
             }
 
             Channel* out_channel = Job::leader ? Job::leader : activeChannel;
@@ -274,6 +310,12 @@ void protocol_main_loop() {
 
         if (sys.abort()) {
             sys.set_abort(false);
+        }
+
+        // Check if there are any blocks in the buffer. If not return to MPG mode.
+        if (restore_mpg_mode) {
+            // Buffer is empty, enable the MPGs
+            enter_mpg_mode();
         }
 
         // check to see if we should disable the stepper drivers
@@ -412,6 +454,8 @@ static void protocol_do_soft_restart() {
     if (state_is(State::Idle)) {
         config->_macros->_after_reset.run(&allChannels);
     }
+
+    enter_mpg_mode();
 }
 
 static void protocol_do_start() {
@@ -461,12 +505,14 @@ static void protocol_do_alarm(void* alarmVoid) {
         set_state(State::Critical);  // Set system alarm state
         alarm_msg(lastAlarm);
         report_error_message(Message::CriticalEvent);
+        enter_mpg_mode();
         return;
     }
     if (lastAlarm == ExecAlarm::SoftLimit) {
         set_state(State::Critical);  // Set system alarm state
         alarm_msg(lastAlarm);
         report_error_message(Message::CriticalEvent);
+        enter_mpg_mode();
         return;
     }
     set_state(State::Alarm);
@@ -580,6 +626,7 @@ static void protocol_do_feedhold() {
             break;
     }
     set_state(State::Hold);
+    enter_mpg_mode();
 }
 
 static void protocol_do_safety_door() {
@@ -862,6 +909,8 @@ void protocol_do_cycle_stop() {
         default:  // Held, Critical
             break;
     }
+
+    enter_mpg_mode();
 }
 
 static void update_velocities() {
@@ -1130,12 +1179,14 @@ static void protocol_do_limit(void* arg) {
         Machine::Homing::limitReached();
         return;
     }
-    if ((state_is(State::Cycle) || state_is(State::Jog) || state_is(State::Idle) || state_is(State::Hold) || state_is(State::SafetyDoor)) &&
-        limit->isHard()) {
+    // Do not enter the alarm state in MPG mode. Motion in the limit direction will be limited by the MPG.
+    if ((state_is(State::Idle) && !sys.mpg_mode()) ||
+        (state_is(State::Cycle) || state_is(State::Jog) || state_is(State::Hold) || state_is(State::SafetyDoor)) && limit->isHard()) {
         mc_critical(ExecAlarm::HardLimit);
     }
     log_debug("Limit switch tripped for " << Axes::axisName(limit->_axis) << " motor " << limit->_motorNum);
 }
+
 static void protocol_do_fault_pin(void* arg) {
     if (inMotionState() || state_is(State::Idle) || state_is(State::Hold) || state_is(State::SafetyDoor)) {
         mc_critical(ExecAlarm::HardStop);  // Initiate system kill.
@@ -1143,6 +1194,7 @@ static void protocol_do_fault_pin(void* arg) {
     ControlPin* pin = (ControlPin*)arg;
     log_info("Stopped by " << pin->legend());
 }
+
 void protocol_do_rt_reset() {
     if (state_is(State::Homing)) {
         Machine::Homing::fail(ExecAlarm::HomingFailReset);
